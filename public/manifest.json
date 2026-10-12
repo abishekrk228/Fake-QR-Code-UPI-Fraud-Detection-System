@@ -1,0 +1,17 @@
+{
+  "name": "SecureQR Fraud Detector",
+  "short_name": "SecureQR",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#1e3a8a",
+  "description": "QR Code & UPI Fraud Detection System",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

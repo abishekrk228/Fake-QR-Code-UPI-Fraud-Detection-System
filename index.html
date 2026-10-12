@@ -4,11 +4,25 @@
     <head>
       
       <meta charset="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+      <meta name="theme-color" content="#1e3a8a" />
+      <meta name="apple-mobile-web-app-capable" content="yes" />
+      <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
       <title>Cybersecurity Web Application</title>
       <meta name="description" content="Enhance your security with a QR code and UPI fraud detection system that verifies merchants, scans codes, and provides trust scores for safe transactions." />
       <meta name="robots" content="noindex, nofollow" />
-      <style>html, body { height: 100%; margin: 0; } #root { height: 100%; }</style>
+      <link rel="manifest" href="/manifest.json" />
+      <style>
+        html, body { 
+          height: 100%; 
+          margin: 0; 
+          overscroll-behavior-y: none; /* Prevents pull-to-refresh */
+          -webkit-tap-highlight-color: transparent; /* Removes blue tap box on mobile */
+          user-select: none; /* Prevents text highlighting when tapping */
+        } 
+        #root { height: 100%; }
+        input, textarea { user-select: auto; } /* Let users type in inputs */
+      </style>
       
     </head>
 
@@ -16,7 +30,13 @@
       
       <div id="root"></div>
       <script type="module" src="/src/main.tsx"></script>
-      
+      <script>
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js');
+          });
+        }
+      </script>
     </body>
   </html>
   

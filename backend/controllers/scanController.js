@@ -2,7 +2,8 @@ const db = require("../config/db");
 const generateHash = require("../utils/sha512");
 
 const scanQR = (req, res) => {
-
+    console.log("[BACKEND] Received scan request for UPI ID:", req.body.upiId);
+    
     const { upiId } = req.body;
 
     if (!upiId) {

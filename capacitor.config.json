@@ -1,0 +1,9 @@
+{
+  "appId": "com.secureqr.app",
+  "appName": "SecureQR",
+  "webDir": "dist",
+  "server": {
+    "cleartext": true,
+    "androidScheme": "http"
+  }
+}

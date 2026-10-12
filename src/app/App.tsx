@@ -1,6 +1,10 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import axios from "axios";
 import jsQR from "jsqr";
+
+import { Capacitor } from "@capacitor/core";
+const API_BASE = Capacitor.isNativePlatform() ? "http://192.168.29.195:5000/api" : "/api";
+
 import {
   Shield, QrCode, Upload, Camera, CheckCircle, AlertTriangle, XCircle,
   LayoutDashboard, Users, ScanLine, BadgeCheck, HelpCircle, AlertOctagon,
@@ -145,7 +149,7 @@ async function simulateSHA512(input: string): Promise<string> {
 async function processQRWorkflow(upiId: string): Promise<ScanResult> {
 
   const response = await axios.post(
-    "http://localhost:5000/api/scan",
+    `${API_BASE}/scan`,
     {
       upiId
     }
@@ -155,7 +159,7 @@ async function processQRWorkflow(upiId: string): Promise<ScanResult> {
 
   return {
 
-    id: crypto.randomUUID().slice(0, 8).toUpperCase(),
+    id: Math.random().toString(36).slice(2, 10).toUpperCase(),
 
     merchantName: data.merchantName,
 
@@ -201,12 +205,12 @@ function StatusBadge({ status }: { status: ScanStatus }) {
     Safe: { cls: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30", icon: CheckCircle },
     Warning: { cls: "bg-amber-500/15 text-amber-400 border-amber-500/30", icon: AlertTriangle },
     "High Risk": { cls: "bg-red-500/15 text-red-400 border-red-500/30", icon: XCircle },
-  }[status];
+  }[status] || { cls: "bg-red-500/15 text-red-400 border-red-500/30", icon: AlertTriangle };
   const Icon = config.icon;
   return (
     <span className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold border ${config.cls}`}>
       <Icon size={11} />
-      {status.toUpperCase()}
+      {(status || 'Unknown').toUpperCase()}
     </span>
   );
 }
@@ -415,6 +419,11 @@ function UserPortal({ history, setHistory, onScanComplete }: {
       setPhase("result");
       stopCamera();
       await onScanComplete();
+    } catch (err: any) {
+      console.error(err);
+      setPhase("idle");
+      setScannerMessage("");
+      setCameraError(`Network Error! Tried hitting: ${API_BASE}/scan. Original error: ${err.message}`);
     } finally {
       isProcessingScanRef.current = false;
     }
@@ -650,7 +659,7 @@ function UserPortal({ history, setHistory, onScanComplete }: {
           {/* Left: Scanner */}
           <div className="space-y-4">
             <h2 className="text-base font-semibold text-foreground font-mono uppercase tracking-widest flex items-center gap-2">
-              <ScanLine size={16} className="text-blue-400" /> Scanner
+              <ScanLine size={16} className="text-blue-400" /> Scanning QR Code
             </h2>
 
             {phase === "result" && result ? (
@@ -1096,7 +1105,7 @@ export default function App() {
 
   const loadHistory = useCallback(async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/history");
+      const res = await axios.get(`${API_BASE}/history`);
       const formatted: ScanResult[] = res.data.map((item: any) => ({
         id: item.id.toString(),
         merchantName: item.merchant_name,
@@ -1116,7 +1125,7 @@ export default function App() {
 
   const loadMerchants = useCallback(async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/merchants");
+      const res = await axios.get(`${API_BASE}/merchants`);
       setMerchants(res.data);
     } catch (err) {
       console.error("Failed to load merchants", err);
@@ -1125,7 +1134,7 @@ export default function App() {
 
   useEffect(() => {
     const loadDashboard = async () => {
-      const res = await axios.get("http://localhost:5000/api/dashboard");
+      const res = await axios.get(`${API_BASE}/dashboard`);
       setDashboard(res.data);
     };
     loadDashboard();
